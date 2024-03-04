@@ -10,9 +10,8 @@ import (
 )
 
 type Config struct {
-	Host        string         `yaml:"host"`
-	TCPPort     int            `yaml:"tcp_port"`
-	UDPPort     int            `yaml:"udp_port"`
+	Addr        string         `yaml:"address"`
+	Port        int            `yaml:"port"`
 	MetricsPort int            `yaml:"metrics_port"`
 	LogLevel    string         `yaml:"log_level"`
 	LogEncoding string         `yaml:"log_encoding"`
@@ -28,9 +27,8 @@ type UpstreamConfig struct {
 
 // Defaults sets default values for the configuration
 func (conf *Config) Defaults() {
-	conf.Host = "127.0.0.1"
-	conf.TCPPort = 1153
-	conf.UDPPort = 1153
+	conf.Addr = "127.0.0.1"
+	conf.Port = 1153
 	conf.MetricsPort = 8090
 	conf.LogLevel = "info"
 	conf.LogEncoding = "console"

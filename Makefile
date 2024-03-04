@@ -39,5 +39,5 @@ test:
 build:
 	@echo 'compiling binary...'
 	# @cd cmd/ && GOARCH=amd64 GOOS=linux go build -ldflags "-X main.buildTimestamp=$(BUILD_DATE) -X main.gitHash=$(GIT_COMMIT) -X main.buildVersion=$(BUILD_VERSION)" -o ../$(BINARY_NAME)
-	@cd cmd/ && GOARCH=arm64 GOOS=linux go build -ldflags "-X main.buildTimestamp=$(BUILD_DATE) -X main.gitHash=$(GIT_COMMIT) -X main.buildVersion=$(BUILD_VERSION)" -o ../$(BINARY_NAME)
+	@cd cmd/${PROJECT_NAME} && GOARCH=arm64 GOOS=linux go build -ldflags "-X main.buildTimestamp=$(BUILD_DATE) -X main.gitHash=$(GIT_COMMIT) -X main.buildVersion=$(BUILD_VERSION)" -o ../../$(BINARY_NAME)
 
