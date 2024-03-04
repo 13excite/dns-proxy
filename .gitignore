@@ -11,4 +11,4 @@ __pycache__
 ./*.ini
 .vscode
 env
-frontend/node_modules
+coverage.txt
