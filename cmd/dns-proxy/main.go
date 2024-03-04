@@ -20,10 +20,14 @@ func main() {
 		c := &config.Config{}
 		c.Defaults()
 
-		logger.InitLogger(c)
+		err := logger.InitLogger(c)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		// create a new server and listen on the TCP network address
 		dnsServer := dns.NewServer("tcp", c)
-		err := dnsServer.ListenAndServe()
+		err = dnsServer.ListenAndServe()
 		if err != nil {
 			fmt.Println(err)
 		}

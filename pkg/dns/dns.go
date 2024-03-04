@@ -92,7 +92,11 @@ func (srv *Server) serveTCP(listner *net.TCPListener) error {
 			}
 			defer dnsConn.Close()
 
-			dnsConn.Write(tbuff[:size])
+			_, err = dnsConn.Write(tbuff[:size])
+			if err != nil {
+				srv.logger.Errorw("failed to write to the clinet connection", "error", err)
+				return
+			}
 
 			// straight forward copy response  from dnsConn to downStreamConn
 			_, err = io.Copy(downStreamConn, dnsConn)
