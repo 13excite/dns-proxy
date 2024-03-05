@@ -1,0 +1,10 @@
+address: "127.0.0.1"
+port: 1153
+metrics_port: 8090
+log_level: "info"
+log_encoding: "console"
+upstream:
+  address: "1.1.1.1"
+  port: 853
+  hostname: "one.one.one.one"
+  timeout: 2

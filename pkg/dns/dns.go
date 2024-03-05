@@ -46,7 +46,7 @@ func (srv *Server) ListenAndServe() error {
 		if err != nil {
 			return err
 		}
-		srv.logger.Infow("started", "address", srv.Addr, "port", srv.Port, "network", srv.Net)
+		srv.logger.Infow("TCP listner started", "address", srv.Addr, "port", srv.Port, "network", srv.Net)
 		return srv.serveTCP(listner)
 
 	case "udp":
@@ -109,6 +109,8 @@ func (srv *Server) serveTCP(listner *net.TCPListener) error {
 	}
 }
 
+// validateDNSReq validates the incoming DNS request
+// it checks the size of the DNS packet and the DNS packet itself
 func (srv *Server) validateDNSReq(b []byte, size int) error {
 	DNSMsgLength := binary.BigEndian.Uint16(b[:2])
 	if int(DNSMsgLength) != size-2 {

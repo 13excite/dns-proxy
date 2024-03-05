@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -10,16 +11,25 @@ import (
 )
 
 func main() {
-	// simple subcommand dispatcher with cobra or pflag
-	if len(os.Args) < 2 {
-		fmt.Println("expected 'tcp' or 'udp' subcommands")
+	tcpMode := flag.Bool("tcp", false, "tcp mode")
+	udpMode := flag.Bool("udp", false, "udp mode")
+	configPath := flag.String("config", "", "path to the cfg file (optional)")
+	flag.Parse()
+
+	// check if the user has specified a mode
+	if !*tcpMode && !*udpMode {
+		fmt.Println("You must specify a mode: tcp or udp")
+		flag.Usage()
 		os.Exit(1)
 	}
-	switch os.Args[1] {
-	case "tcp":
+	if *tcpMode {
 		c := &config.Config{}
 		c.Defaults()
 
+		if *configPath != "" {
+			c.ReadConfigFile(*configPath)
+		}
+		// initialize the logger
 		err := logger.InitLogger(c)
 		if err != nil {
 			fmt.Println(err)
@@ -31,10 +41,8 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-	case "udp":
+	}
+	if *udpMode {
 		fmt.Println("udp")
-	default:
-		fmt.Println("expected 'tcp' or 'udp' subcommands")
-		os.Exit(1)
 	}
 }
