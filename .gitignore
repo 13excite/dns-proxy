@@ -8,7 +8,6 @@ __pycache__
 *.log
 *.pyc
 *.toml
-*.yml
 *.yaml
 ./*.ini
 .vscode
