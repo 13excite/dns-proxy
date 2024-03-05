@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/miekg/dns"
 	"go.uber.org/zap"
 )
 
@@ -35,27 +36,36 @@ func NewServer(netPrefix string, config *config.Config) *Server {
 // calls Serve to handle requests on incoming connections
 func (srv *Server) ListenAndServe() error {
 	srv.logger.Infow("Server is starting")
+
+	// parse the address and check if it's valid
 	ip := net.ParseIP(srv.Addr)
 	if ip == nil {
 		srv.logger.Errorw("failed to parse address", "address", srv.Addr)
 		return fmt.Errorf("failed to parse address: %s", srv.Addr)
 	}
+	// check the network type and start the server
 	switch srv.Net {
 	case "tcp":
 		listner, err := net.ListenTCP("tcp", &net.TCPAddr{IP: ip, Port: srv.Port})
 		if err != nil {
 			return err
 		}
-		srv.logger.Infow("TCP listner started", "address", srv.Addr, "port", srv.Port, "network", srv.Net)
+		srv.logger.Infow("Listner started", "address", srv.Addr, "port", srv.Port, "network", srv.Net)
 		return srv.serveTCP(listner)
 
 	case "udp":
-		fmt.Println("udp")
-		return nil
+		// so, I already spent a few hours for tcp part, due to the lack of time,
+		// I implement the udp part as a dummy with miekg/dns library
+		dns.HandleFunc(".", srv.udpHandler())
+		udp := dns.Server{Addr: fmt.Sprintf("%s:%d", srv.Addr, srv.Port), Net: "udp"}
+
+		srv.logger.Infow("UDP listner started", "address", srv.Addr, "port", srv.Port, "network", srv.Net)
+		return udp.ListenAndServe()
 	}
 	return fmt.Errorf("unsupported network type: %s", srv.Net)
 }
 
+// serveTCP serves the incoming DNS requests over TCP
 func (srv *Server) serveTCP(listner *net.TCPListener) error {
 	defer listner.Close()
 
@@ -85,32 +95,31 @@ func (srv *Server) serveTCP(listner *net.TCPListener) error {
 				return
 			}
 
-			dnsConn, err := srv.Client.Dial()
+			upStreamConn, err := srv.Client.Dial()
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
-			defer dnsConn.Close()
+			defer upStreamConn.Close()
 
-			_, err = dnsConn.Write(tbuff[:size])
+			_, err = upStreamConn.Write(tbuff[:size])
 			if err != nil {
 				srv.logger.Errorw("failed to write to the clinet connection", "error", err)
 				return
 			}
 
-			// straight forward copy response  from dnsConn to downStreamConn
-			_, err = io.Copy(downStreamConn, dnsConn)
+			// straight forward copy response from dnsConn to downStreamConn
+			_, err = io.Copy(downStreamConn, upStreamConn)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
-
 		}(downStreamConn)
 	}
 }
 
-// validateDNSReq validates the incoming DNS request
-// it checks the size of the DNS packet and the DNS packet itself
+// validateDNSReq validates the incoming DNS request.
+// func checks the size of the DNS packet and the DNS packet itself
 func (srv *Server) validateDNSReq(b []byte, size int) error {
 	DNSMsgLength := binary.BigEndian.Uint16(b[:2])
 	if int(DNSMsgLength) != size-2 {

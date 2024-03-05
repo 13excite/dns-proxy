@@ -24,6 +24,8 @@ func DefaultClinet() *Client {
 		TLSConfig: &tls.Config{
 			ServerName: "one.one.one.one",
 			MinVersion: tls.VersionTLS12,
+			// think about algorithm supported by TLS
+			// CipherSuites: []uint16{tls.TLS_AES_256_GCM_SHA384},
 		},
 		Dialer: &net.Dialer{
 			Timeout: 2 * time.Second,
