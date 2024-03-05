@@ -27,7 +27,7 @@ type UpstreamConfig struct {
 
 // Defaults sets default values for the configuration
 func (conf *Config) Defaults() {
-	conf.Addr = "127.0.0.1"
+	conf.Addr = "0.0.0.0"
 	conf.Port = 1153
 	conf.MetricsPort = 8090
 	conf.LogLevel = "info"
