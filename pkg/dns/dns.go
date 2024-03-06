@@ -90,7 +90,7 @@ func (srv *Server) serveTCP(listner *net.TCPListener) error {
 				return
 			}
 
-			err = srv.validateDNSReq(tbuff, size)
+			err = srv.validateTCPDNSReq(tbuff, size)
 			if err != nil {
 				return
 			}
@@ -118,15 +118,15 @@ func (srv *Server) serveTCP(listner *net.TCPListener) error {
 	}
 }
 
-// validateDNSReq validates the incoming DNS request.
+// validateTCPDNSReq validates the incoming DNS request.
 // func checks the size of the DNS packet and the DNS packet itself
-func (srv *Server) validateDNSReq(b []byte, size int) error {
+func (srv *Server) validateTCPDNSReq(b []byte, size int) error {
 	DNSMsgLength := binary.BigEndian.Uint16(b[:2])
 	if int(DNSMsgLength) != size-2 {
-		srv.logger.Errorw("Size incorrect", "expected", DNSMsgLength, "actual", size)
-		return fmt.Errorf("Size incorrect: %d, %d", DNSMsgLength, size)
+		srv.logger.Errorw("Size is incorrect", "expected", DNSMsgLength, "actual", size)
+		return fmt.Errorf("Size is incorrect. expected: %d, got: %d", DNSMsgLength, size)
 	}
-	srv.logger.Debugw("Size correct", "size", DNSMsgLength)
+	srv.logger.Debugw("Size is correct", "size", DNSMsgLength)
 
 	// read the DNS packet with gopacket
 	packet := gopacket.NewPacket(b[2:], layers.LayerTypeDNS, gopacket.Default)
@@ -138,7 +138,9 @@ func (srv *Server) validateDNSReq(b []byte, size int) error {
 		return fmt.Errorf("cannot cast dns packet to layers.DNS")
 	}
 
-	srv.logger.Infow("incoming request", "name", string(tcp.Questions[0].Name), "type", tcp.Questions[0].Type)
+	if tcp.Questions != nil {
+		srv.logger.Infow("incoming request", "name", string(tcp.Questions[0].Name), "type", tcp.Questions[0].Type)
+	}
 
 	return nil
 }
