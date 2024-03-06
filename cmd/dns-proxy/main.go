@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
+
+	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/13excite/dns-proxy/pkg/config"
 	"github.com/13excite/dns-proxy/pkg/dns"
@@ -34,23 +38,30 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	logger := zap.S().With("package", "cmd")
+
+	// create the Group
+	ctx := context.Background()
+	group, _ := errgroup.WithContext(ctx)
+
 	// create a new DNS server in the specified mode
 	if *tcpMode {
 		// create a new server and listen on the TCP network address
 		dnsServer := dns.NewServer("tcp", c)
-		err = dnsServer.ListenAndServe()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		group.Go(
+			dnsServer.ListenAndServe,
+		)
 	}
 	if *udpMode {
-		fmt.Println("udp")
 		dnsServer := dns.NewServer("udp", c)
-		err = dnsServer.ListenAndServe()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		group.Go(
+			dnsServer.ListenAndServe,
+		)
+	}
+
+	err = group.Wait()
+	if err != nil {
+		logger.Errorw("waitgroup returned an error: %w", err)
 	}
 }
