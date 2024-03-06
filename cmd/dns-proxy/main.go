@@ -26,6 +26,13 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
+	// check if the user has specified both modes
+	if *tcpMode && *udpMode {
+		fmt.Println("You can only specify one mode: tcp or udp")
+		flag.Usage()
+		os.Exit(1)
+	}
+
 	c := &config.Config{}
 	c.Defaults()
 
