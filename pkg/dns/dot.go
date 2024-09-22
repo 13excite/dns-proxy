@@ -19,6 +19,7 @@ type Client struct {
 	logger    *zap.SugaredLogger
 }
 
+// DefaultClinet returns a Client with default settings
 func DefaultClinet() *Client {
 	return &Client{
 		TLSConfig: &tls.Config{
@@ -36,6 +37,7 @@ func DefaultClinet() *Client {
 	}
 }
 
+// NewClient returns a new Client with settings from the config
 func NewClient(conf *config.Config) *Client {
 	return &Client{
 		TLSConfig: &tls.Config{

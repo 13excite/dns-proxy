@@ -1,3 +1,4 @@
+// Package dns contains DNS and proxy-DNS logic
 package dns
 
 import (
@@ -14,6 +15,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// Server is the main proxy-dns server
 type Server struct {
 	Addr   string
 	Port   int
@@ -22,6 +24,7 @@ type Server struct {
 	logger *zap.SugaredLogger
 }
 
+// NewServer returns a new Server with settings from config
 func NewServer(netPrefix string, config *config.Config) *Server {
 	return &Server{
 		Addr:   config.Addr,

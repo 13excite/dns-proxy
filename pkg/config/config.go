@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Config is the main config of the service
 type Config struct {
 	Addr        string         `yaml:"address"`
 	Port        int            `yaml:"port"`
@@ -18,6 +19,7 @@ type Config struct {
 	Upstream    UpstreamConfig `yaml:"upstream"`
 }
 
+// UpstreamConfig contains info about upstream DNS over TLS resolver
 type UpstreamConfig struct {
 	Address  string `yaml:"address"`
 	Port     int    `yaml:"port"`

@@ -1,3 +1,4 @@
+// Package main the entrypoint for the dns-proxy
 package main
 
 import (
