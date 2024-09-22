@@ -58,7 +58,7 @@ make build-docker && make docker-run-udp
 # test cmd how it works for TCP
 dig -p 53 +short +tcp  goole.com @localhost
 
-# test cmd how it works for TCP
+# test cmd how it works for UDP
 dig -p 53 +short  google.com @localhost
 ```
 
